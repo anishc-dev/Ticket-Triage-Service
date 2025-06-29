@@ -1,9 +1,11 @@
-FastAPI==0.115.14
-uvicorn==0.35.0
-pydantic==2.11.7
-numpy==1.24.3
-chromadb==0.4.22
-requests==2.31.0
-beautifulsoup4==4.12.2
-sentence-transformers==2.2.2
-lxml==4.9.3
+FastAPI==0.115.14 #for API
+uvicorn==0.35.0 # AWSGI for running the API
+pydantic==2.11.7 # to evaluate the input data
+numpy==1.24.3 # for numerical operations
+chromadb==0.4.22 # for vector database
+requests==2.31.0 # for making HTTP requests
+beautifulsoup4==4.12.2 # for parsing HTML
+sentence-transformers==2.2.2 # for generating embeddings
+huggingface-hub==0.16.4 # for downloading models
+lxml==4.9.3 # for parsing XML
+openai==1.65.0 # for making API calls to OpenAI

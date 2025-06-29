@@ -1,5 +1,6 @@
-from fastapi import FastAPI, Response
-from endpoints.listener import router
+from fastapi import FastAPI
+from endpoints.listener import router as listener_router
+from endpoints.chroma_db import router as chromadb_router
 from ingestion.document_ingestion import DocumentIngestion
 import logging
 import traceback
@@ -10,7 +11,8 @@ logger = logging.getLogger(__name__)
 
 app = FastAPI()
 
-app.include_router(router)
+app.include_router(listener_router)
+app.include_router(chromadb_router)
 
 @app.on_event("startup")
 async def startup_event():
@@ -41,25 +43,3 @@ async def startup_event():
 @app.get("/")
 async def root():
     return {"message": "Welcome to the Ticket Triage Service API"}
-
-@app.get("/chromadb")
-async def chromadb_html():
-    try:
-        ingestion = DocumentIngestion()
-        count = ingestion.get_collection_stats()
-        results = ingestion.collection.get(limit=min(10, count), include=["documents"])
-        ids = results["ids"]
-        html = f"""
-        <html><head><title>ChromaDB Contents</title></head><body>
-        <h2>ChromaDB Collection: netskope_docs</h2>
-        <p>Total documents: <b>{count}</b></p>
-        <h3>Sample Document IDs (first 10):</h3>
-        <ul>
-        {''.join(f'<li>{doc_id}</li>' for doc_id in ids)}
-        </ul>
-        </body></html>
-        """
-        return Response(content=html, media_type="text/html")
-    except Exception as e:
-        logging.error(f"Error during chromadb_html: {e}")
-        return Response(content=f"Error: {str(e)}", media_type="text/plain")

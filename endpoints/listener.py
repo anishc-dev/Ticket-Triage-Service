@@ -11,8 +11,14 @@ router = APIRouter()
 
 @router.post("/respond")
 async def respond(ticket: Ticket):
+    """
+        To respond to support engineer questions.
+    """
     return {"message": "Hello Respond"}
 
 @router.post("/classify")
 async def classify(ticket: Ticket):
+    """
+        To classify the ticket into a category.
+    """
     return {"message": "Hello Classify"}
