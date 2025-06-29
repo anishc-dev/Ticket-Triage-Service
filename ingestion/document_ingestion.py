@@ -43,5 +43,23 @@ class DocumentIngestion:
             Get the stats of the chromadb collection
         """
         return self.collection.count()
+    
+    def query_documents(self, query_text, n_results=5):
+        """
+            Query documents from ChromaDB and return a flat list of documents.
+        """
+        try:
+            result = self.collection.query(
+                query_texts=[query_text],
+                include=["documents"],
+                n_results=n_results
+            )
+            # ChromaDB returns documents as a list of lists, where each sublist corresponds to a query
+            # For single queries, we return the first (and only) sublist
+            documents = result.get("documents", [[]])[0] if result.get("documents") else []
+            return documents
+        except Exception as e:
+            logging.error(f"Error querying documents: {e}")
+            return []
 
 

@@ -8,5 +8,7 @@ services:
       - "8002:8000"
     environment:
       - PYTHON_ENVIRONMENT=../app
+      - GEMINI_API_KEY=AIzaSyClHzrHzfj9CVJ70N0Lj_FnG1bglaKCNJA
     volumes:
       - ./chroma_db:/app/chroma_db
+    

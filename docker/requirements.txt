@@ -7,4 +7,6 @@ requests==2.31.0 # for making HTTP requests
 beautifulsoup4==4.12.2 # for parsing HTML
 sentence-transformers==2.2.2 # for generating embeddings
 huggingface-hub==0.16.4 # for downloading models
-lxml==4.9.3 # for parsing XMLopenai==1.65.0 # for making API calls to OpenAI
+lxml==4.9.3 # for parsing XML
+openai==1.65.0 # for making API calls to OpenAI
+google-generativeai==0.3.1 # for making API calls to Google Gemini
