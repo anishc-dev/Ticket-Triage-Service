@@ -3,6 +3,7 @@
 """
 
 import chromadb
+import logging
 from ingestion.sitemap_parser import SitemapParser
 
 
@@ -11,7 +12,11 @@ class DocumentIngestion:
         # Initalising the chromadb for vector database
         self.client = chromadb.PersistentClient(path="./chroma_db")
         # Creating a collection for the documents
-        self.collection = self.client.get_collection("netskope_docs")
+        try:
+            self.collection = self.client.get_collection("netskope_docs")
+        except:
+            # Create the collection if it doesn't exist
+            self.collection = self.client.create_collection("netskope_docs")
         self.sitemap = "https://docs.netskope.com/docs-sitemap.xml"
     
     def ingest_from_sitemap(self):
@@ -32,5 +37,11 @@ class DocumentIngestion:
             documents=[content],
             ids=[url]
         )
+    
+    def get_collection_stats(self):
+        """
+            Get the stats of the chromadb collection
+        """
+        return self.collection.count()
 
 

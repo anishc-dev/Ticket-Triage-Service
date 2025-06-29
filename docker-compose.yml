@@ -5,6 +5,8 @@ services:
     build:
       context: .
     ports:
-      - "8001:8000"
+      - "8002:8000"
     environment:
       - PYTHON_ENVIRONMENT=../app
+    volumes:
+      - ./chroma_db:/app/chroma_db
