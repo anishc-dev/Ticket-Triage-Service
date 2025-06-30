@@ -53,10 +53,3 @@ async def respond(input: QuestionRequest):
         
     except Exception as e:
         return {"message": f"Error: {str(e)}"}
-
-@router.post("/classify")
-async def classify(question: QuestionRequest):
-    """
-        To classify the ticket into a category.
-    """
-    return {"message": "Hello Classify"}

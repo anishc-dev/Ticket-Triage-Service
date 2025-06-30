@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from endpoints.listener import router as listener_router
 from endpoints.chroma_db import router as chromadb_router
 from ingestion.document_ingestion import DocumentIngestion
+from endpoints.ticket_classifier import router as ticket_classifier_router
 import logging
 import traceback
 
@@ -13,6 +14,7 @@ app = FastAPI()
 
 app.include_router(listener_router)
 app.include_router(chromadb_router)
+app.include_router(ticket_classifier_router)
 
 @app.on_event("startup")
 async def startup_event():

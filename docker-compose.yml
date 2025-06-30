@@ -18,6 +18,8 @@ services:
   postgres:
     image: postgres:15
     ports:
-      - "5432:5432"
+      - "5435:5435"
     environment:
-      - POSTGRES_URL=postgresql://postgres:password@postgres:5432/sla_monitor
+      - POSTGRES_DB=ticket_triage
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
