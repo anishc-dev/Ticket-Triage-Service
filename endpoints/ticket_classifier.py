@@ -1,5 +1,7 @@
 import datetime
-from fastapi import APIRouter
+from fastapi import APIRouter, Request
+from fastapi.responses import HTMLResponse
+from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel, Field
 from typing import Optional
 from google import generativeai
@@ -11,12 +13,20 @@ from database.database import insert_into_table, create_table, TABLE_COLUMNS
 import logging
 
 router = APIRouter()
+templates = Jinja2Templates(directory="templates")
 
 class Ticket(BaseModel):
     ticket_id: Optional[int] = Field(default=0)
     subject: str = Field(default="This is a test subject")
     description: str = Field(default="This is a test description")
     priority: str = Field(default="Low")
+
+@router.get("/classify", response_class=HTMLResponse)
+async def classify_html(request: Request):
+    """
+    Interactive HTML interface for ticket classification.
+    """
+    return templates.TemplateResponse("classify.html", {"request": request})
 
 @router.post("/classify")
 async def classify(ticket: Ticket):
