@@ -10,3 +10,4 @@ huggingface-hub==0.16.4 # for downloading models
 lxml==4.9.3 # for parsing XML
 openai==1.65.0 # for making API calls to OpenAI
 google-generativeai==0.3.1 # for making API calls to Google Gemini
+jinja2==3.1.2 # for HTML template rendering

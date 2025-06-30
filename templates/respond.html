@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Netskope Support Assistant</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #34495e;
+        }
+        textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            resize: vertical;
+            min-height: 100px;
+            font-family: inherit;
+        }
+        textarea:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+        button {
+            background-color: #3498db;
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        .loading {
+            display: none;
+            text-align: center;
+            margin: 20px 0;
+            color: #7f8c8d;
+        }
+        .result {
+            margin-top: 30px;
+            padding: 20px;
+            border-radius: 5px;
+            display: none;
+        }
+        .response {
+            background-color: #e8f4fd;
+            border-left: 4px solid #3498db;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        .documents {
+            background-color: #f8f9fa;
+            border-left: 4px solid #28a745;
+            padding: 15px;
+        }
+        .document-item {
+            margin: 8px 0;
+            padding: 8px;
+            background-color: white;
+            border-radius: 3px;
+            border-left: 3px solid #28a745;
+        }
+        .document-item a {
+            color: #2c3e50;
+            text-decoration: none;
+        }
+        .document-item a:hover {
+            color: #3498db;
+        }
+        .error {
+            background-color: #f8d7da;
+            border-left: 4px solid #dc3545;
+            color: #721c24;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 Netskope Support Assistant</h1>
+        <p style="text-align: center; color: #7f8c8d; margin-bottom: 30px;">
+            Ask questions about Netskope configuration, security policies, and more.
+        </p>
+        
+        <form id="queryForm">
+            <div class="form-group">
+                <label for="question">Your Question:</label>
+                <textarea 
+                    id="question" 
+                    name="question" 
+                    placeholder="e.g., How do I configure Netskope for cloud applications? What are the security policies? How to set up Netskope client?"
+                    required></textarea>
+            </div>
+            <button type="submit">🔍 Search & Get Answer</button>
+        </form>
+        
+        <div class="loading" id="loading">
+            <p>🤔 Thinking...</p>
+        </div>
+        
+        <div class="result" id="result">
+            <div class="response" id="response"></div>
+            <div class="documents" id="documents"></div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('queryForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const question = document.getElementById('question').value;
+            const loading = document.getElementById('loading');
+            const result = document.getElementById('result');
+            const responseDiv = document.getElementById('response');
+            const documentsDiv = document.getElementById('documents');
+            
+            // Show loading
+            loading.style.display = 'block';
+            result.style.display = 'none';
+            
+            try {
+                const response = await fetch('/respond', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ question: question })
+                });
+                
+                const data = await response.json();
+                
+                // Hide loading
+                loading.style.display = 'none';
+                
+                if (data.message && data.message.includes('Error')) {
+                    // Show error
+                    responseDiv.innerHTML = `<h3>❌ Error</h3><p>${data.message}</p>`;
+                    responseDiv.className = 'response error';
+                    result.style.display = 'block';
+                } else {
+                    // Show response
+                    responseDiv.innerHTML = `<h3>💡 Answer</h3><p>${data.response}</p>`;
+                    responseDiv.className = 'response';
+                    
+                    // Show documents
+                    if (data.documents && data.documents.length > 0) {
+                        let docsHtml = '<h3>📚 Relevant Documentation</h3>';
+                        data.documents.forEach(doc => {
+                            docsHtml += `<div class="document-item"><a href="${doc}" target="_blank">${doc}</a></div>`;
+                        });
+                        documentsDiv.innerHTML = docsHtml;
+                    } else {
+                        documentsDiv.innerHTML = '<h3>📚 Relevant Documentation</h3><p>No relevant documents found.</p>';
+                    }
+                    
+                    result.style.display = 'block';
+                }
+            } catch (error) {
+                loading.style.display = 'none';
+                responseDiv.innerHTML = `<h3>❌ Error</h3><p>Failed to get response: ${error.message}</p>`;
+                responseDiv.className = 'response error';
+                result.style.display = 'block';
+            }
+        });
+    </script>
+</body>
+</html> 
