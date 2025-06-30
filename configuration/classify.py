@@ -23,7 +23,7 @@ class categories:
             "Digital Experience Management"
         ]
 
-class priority:
+class Priority:
     def __init__(self):
         self.priority = ["Low", "Medium", "High"]
 

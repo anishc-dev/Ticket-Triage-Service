@@ -1,9 +1,14 @@
+import datetime
 from fastapi import APIRouter
 from pydantic import BaseModel, Field
 from typing import Optional
 from google import generativeai
 import os
-from configuration.classify import categories, priority
+import re
+import json
+from configuration.classify import categories, Priority 
+from database.database import insert_into_table, create_table, TABLE_COLUMNS    
+import logging
 
 router = APIRouter()
 
@@ -18,18 +23,67 @@ async def classify(ticket: Ticket):
     """
         To classify the ticket into a category.
     """
-    gemini_key = os.getenv("GEMINI_API_KEY")
-    if not gemini_key:
-        return{"message: No AI key defined"}
-    generativeai.configure(api_key=gemini_key)
-    question = ticket.subject + ticket.description
-    prompt = f""" 
-            You are an amazing classifier. Given a ticke description and you need to classify it into a category and urgency. 
-            The category is defined under {categories}
-            The priority is defined under {priority}
-            Question: {question}
-            Answer:
+    try:
+        gemini_key = os.getenv("GEMINI_API_KEY")
+        if not gemini_key:
+            return {"message": "No AI key defined"}
+        
+        generativeai.configure(api_key=gemini_key)
+        question = ticket.subject + " " + ticket.description
+        
+        prompt = f""" 
+        You are an amazing classifier. Given a ticket description, classify it into a category and urgency.
+        The category must be one of: {categories().categories}
+        The priority must be one of: {Priority().priority}
+        Question: {question}
+        
+        Respond with ONLY:
+        Category: [category_name]
+        Priority: [priority_level]
+        """
+        
+        model = generativeai.GenerativeModel("gemini-1.5-flash")
+        response = model.generate_content(prompt)
+
+        # Simple regex parsing
+        category_match = re.search(r'Category:\s*([^\n]+)', response.text, re.IGNORECASE)
+        priority_match = re.search(r'Priority:\s*([^\n]+)', response.text, re.IGNORECASE)
+        
+        if not category_match or not priority_match:
+            logging.error(f"No category or priority found in response: {response.text}")
+            return {"message": "No category or priority found in response"}
+        
+        category_value = category_match.group(1).strip() 
+        priority_value = priority_match.group(1).strip()
+        
+        logging.info(f"Parsed classification - Category: {category_value}, Priority: {priority_value}")
+        
+        metadata = create_metadata(category_value, priority_value, ticket.ticket_id) 
+        create_table("TICKET_METADATA", TABLE_COLUMNS["TICKET_METADATA"])
+        insert_into_table("TICKET_METADATA", list(metadata.keys()), list(metadata.values()))   
+        logging.info(f'Successfully inserted metadata of ticket {ticket.ticket_id} into the database')
+
+        return {
+            'message': f'Successfully Classified and inserted metadata of ticket {ticket.ticket_id} into the database',
+            'classification': {
+                'category': category_value,
+                'priority': priority_value,
+                'ticket_id': ticket.ticket_id
+            }
+        }
+        
+    except Exception as e:
+        logging.error(f"Error in classification: {str(e)}")
+        return {"message": f"Error during classification: {str(e)}"}
+
+def create_metadata(category_value, priority_value, ticket_id):
     """
-    model = generativeai.GenerativeModel("gemini-1.5-flash")
-    response = model.generate_content(prompt)
-    return {"message": response.text}
+        To create the metadata for the ticket.
+    """
+    metadata = {
+        "ticket_id": ticket_id,
+        "category": category_value,
+        "priority": priority_value,
+        "query_time": datetime.datetime.now(datetime.timezone.utc).isoformat()
+    }
+    return metadata

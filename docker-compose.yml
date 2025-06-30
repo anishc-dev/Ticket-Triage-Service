@@ -9,6 +9,9 @@ services:
     environment:
       - PYTHON_ENVIRONMENT=../app
       - GEMINI_API_KEY=AIzaSyClHzrHzfj9CVJ70N0Lj_FnG1bglaKCNJA
+      - POSTGRES_DB=ticket_triage
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
     volumes:
       - ./chroma_db:/app/chroma_db
       - ./database:/app/database
@@ -18,7 +21,7 @@ services:
   postgres:
     image: postgres:15
     ports:
-      - "5435:5435"
+      - "5435:5432"
     environment:
       - POSTGRES_DB=ticket_triage
       - POSTGRES_USER=postgres
