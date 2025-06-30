@@ -11,4 +11,13 @@ services:
       - GEMINI_API_KEY=AIzaSyClHzrHzfj9CVJ70N0Lj_FnG1bglaKCNJA
     volumes:
       - ./chroma_db:/app/chroma_db
-    
+      - ./database:/app/database
+    depends_on:
+      - postgres
+
+  postgres:
+    image: postgres:15
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_URL=postgresql://postgres:password@postgres:5432/sla_monitor
