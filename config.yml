@@ -1,4 +1,4 @@
-SITE_URL: "https://www.docs.netskope.com/sitemap.xml"
+SITE_URL: "https://docs.netskope.com/docs-sitemap.xml"
 
 CATEGORIES:
   - "CASB"
@@ -24,4 +24,5 @@ CATEGORIES:
 PRIORITY:
   - "Low"
   - "Medium"
-  - "High"# Test comment added at Wed Jul  2 21:31:52 IST 2025
+  - "High"
+

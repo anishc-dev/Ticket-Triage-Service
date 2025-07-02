@@ -5,6 +5,7 @@ from ingestion.document_ingestion import DocumentIngestion
 from endpoints.ticket_classifier import router as ticket_classifier_router
 import logging
 import traceback
+from notify.notifier import observer
 import os
 # Set up logging
 logging.basicConfig(level=logging.INFO)
@@ -36,6 +37,7 @@ async def startup_event():
         else:
             logger.info(f"ChromaDB already contains {stats} documents")
 
+        logger.info("Config hot reload started successfully")
         logger.info("========================================================")
         logger.info("Application startup completed successfully")
         logger.info("========================================================")
@@ -43,6 +45,7 @@ async def startup_event():
         logger.error(f"Error during startup: {e}")
         logger.error(f"Traceback: {traceback.format_exc()}")
         raise  # Re-raise the exception to prevent the app from starting
+
 
 @app.get("/")
 async def root():
