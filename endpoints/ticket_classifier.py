@@ -8,9 +8,9 @@ from google import generativeai
 import os
 import re
 import json
-from configuration.classify import categories, Priority 
 from database.database import insert_into_table, create_table, TABLE_COLUMNS    
 import logging
+from notify.notifier import CONFIG
 
 router = APIRouter()
 templates = Jinja2Templates(directory="templates")
@@ -43,8 +43,8 @@ async def classify(ticket: Ticket):
         
         prompt = f""" 
         You are an amazing classifier. Given a ticket description, classify it into a category and urgency.
-        The category must be one of: {categories().categories}
-        The priority must be one of: {Priority().priority}
+        The category must be one of: {CONFIG["CATEGORIES"]}
+        The priority must be one of: {CONFIG["PRIORITY"]}
         Question: {question}
         
         Respond with ONLY:

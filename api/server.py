@@ -5,7 +5,7 @@ from ingestion.document_ingestion import DocumentIngestion
 from endpoints.ticket_classifier import router as ticket_classifier_router
 import logging
 import traceback
-
+import os
 # Set up logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -35,8 +35,10 @@ async def startup_event():
             logger.info("ChromaDB updated successfully")
         else:
             logger.info(f"ChromaDB already contains {stats} documents")
-            
+
+        logger.info("========================================================")
         logger.info("Application startup completed successfully")
+        logger.info("========================================================")
     except Exception as e:
         logger.error(f"Error during startup: {e}")
         logger.error(f"Traceback: {traceback.format_exc()}")

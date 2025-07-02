@@ -12,3 +12,5 @@ openai==1.65.0 # for making API calls to OpenAI
 google-generativeai==0.3.1 # for making API calls to Google Gemini
 jinja2==3.1.2 # for HTML template rendering
 psycopg2==2.9.10 # for PostgreSQL database connection
+watchdog==3.0.0 # for file system monitoring and hot reload
+PyYAML==6.0.1 # for YAML configuration parsing

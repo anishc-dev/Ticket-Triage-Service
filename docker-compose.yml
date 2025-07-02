@@ -12,9 +12,11 @@ services:
       - POSTGRES_DB=ticket_triage
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=password
+      - CONFIG_PATH=config.yml
     volumes:
       - ./chroma_db:/app/chroma_db
       - ./database:/app/database
+      - ./config.yml:/app/config.yml
     depends_on:
       - postgres
 

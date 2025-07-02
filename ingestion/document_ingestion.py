@@ -5,6 +5,7 @@
 import chromadb
 import logging
 from ingestion.sitemap_parser import SitemapParser
+from notify.notifier import CONFIG
 
 
 class DocumentIngestion:
@@ -17,8 +18,8 @@ class DocumentIngestion:
         except:
             # Create the collection if it doesn't exist
             self.collection = self.client.create_collection("netskope_docs")
-        self.sitemap = "https://docs.netskope.com/docs-sitemap.xml"
-    
+        self.sitemap = SitemapParser(CONFIG["SITE_URL"]).get_pages()
+
     def ingest_from_sitemap(self):
         """
             Ingest documents from a sitemap and store them in a vector database
