@@ -1,3 +1,7 @@
+## Flow Diagram
+![image](https://github.com/user-attachments/assets/1ab5f75c-0a04-4238-ad62-84914c7113e1)
+
+
 # Ticket Triage Service
 
 A comprehensive ticket classification and response system built with FastAPI, ChromaDB, PostgreSQL, and Google Gemini AI. This service automatically classifies incoming support tickets by product area and urgency, stores metadata in PostgreSQL, and provides intelligent responses using a RAG (Retrieval-Augmented Generation) system.
