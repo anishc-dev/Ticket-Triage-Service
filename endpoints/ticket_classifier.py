@@ -8,7 +8,7 @@ from google import generativeai
 import os
 import re
 import json
-from database.database import insert_into_table, create_table, TABLE_COLUMNS    
+from database.database import insert_into_table, create_table, TABLE_COLUMNS, get_db_connection    
 import logging
 from notify.notifier import CONFIG
 from utils.logger import info, error
@@ -107,3 +107,32 @@ def create_metadata(category_value, priority_value, ticket_id):
         "query_time": datetime.datetime.now(datetime.timezone.utc).isoformat()
     }
     return metadata
+
+@router.get("/tickets")
+async def get_tickets():
+    """
+    Get all tickets from the database.
+    """
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM TICKET_METADATA ORDER BY query_time DESC")
+        tickets = cursor.fetchall()
+        cursor.close()
+        conn.close()
+        
+        # Convert to list of dictionaries
+        ticket_list = []
+        for ticket in tickets:
+            ticket_list.append({
+                "ticket_id": ticket[0],
+                "category": ticket[1], 
+                "priority": ticket[2],
+                "query_time": ticket[3]
+            })
+        
+        return {"tickets": ticket_list, "count": len(ticket_list)}
+        
+    except Exception as e:
+        error(f"Error retrieving tickets: {str(e)}")
+        return {"message": f"Error retrieving tickets: {str(e)}"}
