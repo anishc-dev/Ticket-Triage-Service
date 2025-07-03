@@ -6,7 +6,7 @@ from typing import Optional, List
 from ingestion.document_ingestion import DocumentIngestion
 import os
 import google.generativeai as genai
-
+from utils.logger import info, error
 class QuestionRequest(BaseModel):
     question: Optional[str] = Field(default="Test Question")
 
@@ -30,11 +30,12 @@ async def respond(input: QuestionRequest):
         ingestion = DocumentIngestion()
         
         # this is done to flatten the documents list of list in chromadb
+        info("Querying documents from ChromaDB")
         documents = ingestion.query_documents(question_text, n_results=5)
         
         # Prepare context from documents - now documents is already a flat list
         context = "\n".join([str(doc) for doc in documents])
-
+        info("Context prepared")
         gemini_api_key = os.getenv("GEMINI_API_KEY")
         genai.configure(api_key=gemini_api_key)
         model = genai.GenerativeModel("gemini-1.5-flash")
@@ -45,11 +46,12 @@ async def respond(input: QuestionRequest):
                     Answer:
                 """
         response = model.generate_content(prompt)
-        
+        info("Response generated")        
         return {
             "response": response.text,
             "documents": documents
         }
         
     except Exception as e:
+        error(f"Error: {str(e)}")
         return {"message": f"Error: {str(e)}"}

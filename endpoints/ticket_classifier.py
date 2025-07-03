@@ -11,6 +11,7 @@ import json
 from database.database import insert_into_table, create_table, TABLE_COLUMNS    
 import logging
 from notify.notifier import CONFIG
+from utils.logger import info, error
 
 router = APIRouter()
 templates = Jinja2Templates(directory="templates")
@@ -36,10 +37,12 @@ async def classify(ticket: Ticket):
     try:
         gemini_key = os.getenv("GEMINI_API_KEY")
         if not gemini_key:
+            error("No AI key defined")
             return {"message": "No AI key defined"}
-        
+        info("AI key defined")
         generativeai.configure(api_key=gemini_key)
         question = ticket.subject + " " + ticket.description
+        
         
         prompt = f""" 
         You are an amazing classifier. Given a ticket description, classify it into a category and urgency.
@@ -60,18 +63,18 @@ async def classify(ticket: Ticket):
         priority_match = re.search(r'Priority:\s*([^\n]+)', response.text, re.IGNORECASE)
         
         if not category_match or not priority_match:
-            logging.error(f"No category or priority found in response: {response.text}")
+            error(f"No category or priority found in response: {response.text}")
             return {"message": "No category or priority found in response"}
         
         category_value = category_match.group(1).strip() 
         priority_value = priority_match.group(1).strip()
         
-        logging.info(f"Parsed classification - Category: {category_value}, Priority: {priority_value}")
+        info(f"Parsed classification - Category: {category_value}, Priority: {priority_value}")
         
         metadata = create_metadata(category_value, priority_value, ticket.ticket_id) 
         create_table("TICKET_METADATA", TABLE_COLUMNS["TICKET_METADATA"])
         insert_into_table("TICKET_METADATA", list(metadata.keys()), list(metadata.values()))   
-        logging.info(f'Successfully inserted metadata of ticket {ticket.ticket_id} into the database')
+        info(f'Successfully inserted metadata of ticket {ticket.ticket_id} into the database')
 
         return {
             'message': f'Successfully Classified and inserted metadata of ticket {ticket.ticket_id} into the database',
@@ -83,7 +86,7 @@ async def classify(ticket: Ticket):
         }
         
     except Exception as e:
-        logging.error(f"Error in classification: {str(e)}")
+        error(f"Error in classification: {str(e)}")
         return {"message": f"Error during classification: {str(e)}"}
 
 def create_metadata(category_value, priority_value, ticket_id):
