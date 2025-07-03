@@ -1,5 +1,6 @@
 import requests
 import xml.etree.ElementTree as ET #used element tree for efficiency, used lxml in different project
+from utils.logger import info, error
 
 class SitemapParser:
     def __init__(self, sitemap_url):
@@ -21,5 +22,5 @@ class SitemapParser:
                     pages.append({'url': url, 'content': url})
             return pages
         except Exception as e:
-            print(f"Error parsing sitemap: {e}")
+            error(f"Error parsing sitemap: {e}")
             return []

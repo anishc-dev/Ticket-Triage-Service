@@ -12,6 +12,7 @@ from database.database import insert_into_table, create_table, TABLE_COLUMNS
 import logging
 from notify.notifier import CONFIG
 from utils.logger import info, error
+import time
 
 router = APIRouter()
 templates = Jinja2Templates(directory="templates")
@@ -34,11 +35,13 @@ async def classify(ticket: Ticket):
     """
         To classify the ticket into a category.
     """
+    start_time = time.time()
     try:
         gemini_key = os.getenv("GEMINI_API_KEY")
         if not gemini_key:
             error("No AI key defined")
-            return {"message": "No AI key defined"}
+            processing_time = round(time.time() - start_time, 2)
+            return {"message": "No AI key defined", "processing_time": processing_time}
         info("AI key defined")
         generativeai.configure(api_key=gemini_key)
         question = ticket.subject + " " + ticket.description
@@ -64,7 +67,8 @@ async def classify(ticket: Ticket):
         
         if not category_match or not priority_match:
             error(f"No category or priority found in response: {response.text}")
-            return {"message": "No category or priority found in response"}
+            processing_time = round(time.time() - start_time, 2)
+            return {"message": "No category or priority found in response", "processing_time": processing_time}
         
         category_value = category_match.group(1).strip() 
         priority_value = priority_match.group(1).strip()
@@ -76,18 +80,21 @@ async def classify(ticket: Ticket):
         insert_into_table("TICKET_METADATA", list(metadata.keys()), list(metadata.values()))   
         info(f'Successfully inserted metadata of ticket {ticket.ticket_id} into the database')
 
+        processing_time = round(time.time() - start_time, 2)
         return {
             'message': f'Successfully Classified and inserted metadata of ticket {ticket.ticket_id} into the database',
             'classification': {
                 'category': category_value,
                 'priority': priority_value,
                 'ticket_id': ticket.ticket_id
-            }
+            },
+            'processing_time': processing_time
         }
         
     except Exception as e:
         error(f"Error in classification: {str(e)}")
-        return {"message": f"Error during classification: {str(e)}"}
+        processing_time = round(time.time() - start_time, 2)
+        return {"message": f"Error during classification: {str(e)}", "processing_time": processing_time}
 
 def create_metadata(category_value, priority_value, ticket_id):
     """

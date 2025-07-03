@@ -3,7 +3,7 @@
 """
 
 import chromadb
-import logging
+from utils.logger import info, error
 from ingestion.sitemap_parser import SitemapParser
 from notify.notifier import CONFIG
 
@@ -60,7 +60,7 @@ class DocumentIngestion:
             documents = result.get("documents", [[]])[0] if result.get("documents") else []
             return documents
         except Exception as e:
-            logging.error(f"Error querying documents: {e}")
+            error(f"Error querying documents: {e}")
             return []
 
 

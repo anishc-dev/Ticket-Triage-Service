@@ -14,7 +14,7 @@ def ingest_log(log):
     print(json_log) 
 
 def info(message, **kwargs):
-    log = Log(logging.INFO, message, **kwargs)
+    Log(logging.INFO, message, **kwargs)
 
 def error(message, **kwargs):
     Log(logging.ERROR, message, **kwargs)

@@ -7,6 +7,8 @@ from ingestion.document_ingestion import DocumentIngestion
 import os
 import google.generativeai as genai
 from utils.logger import info, error
+import time
+
 class QuestionRequest(BaseModel):
     question: Optional[str] = Field(default="Test Question")
 
@@ -25,6 +27,7 @@ async def respond(input: QuestionRequest):
     """
         To respond to support engineer questions.
     """
+    start_time = time.time()
     try:
         question_text = input.question
         ingestion = DocumentIngestion()
@@ -47,11 +50,14 @@ async def respond(input: QuestionRequest):
                 """
         response = model.generate_content(prompt)
         info("Response generated")        
+        processing_time = round(time.time() - start_time, 2)
         return {
             "response": response.text,
-            "documents": documents
+            "documents": documents,
+            "processing_time": processing_time
         }
         
     except Exception as e:
         error(f"Error: {str(e)}")
-        return {"message": f"Error: {str(e)}"}
+        processing_time = round(time.time() - start_time, 2)
+        return {"message": f"Error: {str(e)}", "processing_time": processing_time}

@@ -129,6 +129,7 @@
         <div class="result" id="result">
             <div class="response" id="response"></div>
             <div class="documents" id="documents"></div>
+            <div id="processingTime" style="margin-top: 10px; color: #888; font-size: 15px;"></div>
         </div>
     </div>
 
@@ -165,6 +166,7 @@
                     responseDiv.innerHTML = `<h3>❌ Error</h3><p>${data.message}</p>`;
                     responseDiv.className = 'response error';
                     result.style.display = 'block';
+                    document.getElementById('processingTime').innerText = data.processing_time !== undefined ? `⏱️ Processed in ${data.processing_time} seconds` : '';
                 } else {
                     // Show response
                     responseDiv.innerHTML = `<h3>💡 Answer</h3><p>${data.response}</p>`;
@@ -180,7 +182,7 @@
                     } else {
                         documentsDiv.innerHTML = '<h3>📚 Relevant Documentation</h3><p>No relevant documents found.</p>';
                     }
-                    
+                    document.getElementById('processingTime').innerText = data.processing_time !== undefined ? `⏱️ Processed in ${data.processing_time} seconds` : '';
                     result.style.display = 'block';
                 }
             } catch (error) {

@@ -134,6 +134,7 @@
         </form>
         
         <div id="result" class="result"></div>
+        <div id="processingTime" style="margin-top: 10px; color: #888; font-size: 15px; text-align: center;"></div>
     </div>
 
     <script>
@@ -142,11 +143,13 @@
             
             const submitBtn = document.getElementById('submitBtn');
             const resultDiv = document.getElementById('result');
+            const processingTimeDiv = document.getElementById('processingTime');
             
             // Disable button and show loading
             submitBtn.disabled = true;
             submitBtn.textContent = 'Classifying...';
             resultDiv.style.display = 'none';
+            processingTimeDiv.innerText = '';
             
             // Get form data
             const formData = {
@@ -195,6 +198,12 @@
                         <p>${data.message || 'An error occurred during classification.'}</p>
                     `;
                 }
+                
+                // Display processing time
+                if (data.processing_time !== undefined) {
+                    processingTimeDiv.innerText = `⏱️ Processed in ${data.processing_time} seconds`;
+                }
+                
             } catch (error) {
                 resultDiv.className = 'result error';
                 resultDiv.innerHTML = `
