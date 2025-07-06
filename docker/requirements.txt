@@ -14,3 +14,4 @@ jinja2==3.1.2 # for HTML template rendering
 psycopg2==2.9.10 # for PostgreSQL database connection
 watchdog==3.0.0 # for file system monitoring and hot reload
 PyYAML==6.0.1 # for YAML configuration parsing
+asyncpg==0.29.0

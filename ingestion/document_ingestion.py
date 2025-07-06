@@ -6,6 +6,7 @@ import chromadb
 from utils.logger import info, error
 from ingestion.sitemap_parser import SitemapParser
 from notify.notifier import CONFIG
+import asyncio
 
 
 class DocumentIngestion:
@@ -20,7 +21,7 @@ class DocumentIngestion:
             self.collection = self.client.create_collection("netskope_docs")
         self.sitemap = SitemapParser(CONFIG["SITE_URL"]).get_pages()
 
-    def ingest_from_sitemap(self):
+    async def ingest_from_sitemap(self):
         """
             Ingest documents from a sitemap and store them in a vector database
         """
@@ -30,7 +31,7 @@ class DocumentIngestion:
         for page in pages:
             self.ingest_page(page['url'], page['content'])
 
-    def ingest_page(self, url, content):
+    async def ingest_page(self, url, content):
         """
             Ingest a single page into the chromadb collection
         """
@@ -39,13 +40,13 @@ class DocumentIngestion:
             ids=[url]
         )
     
-    def get_collection_stats(self):
+    async def get_collection_stats(self):
         """
             Get the stats of the chromadb collection
         """
         return self.collection.count()
     
-    def query_documents(self, query_text, n_results=5):
+    async def query_documents(self, query_text, n_results=5):
         """
             Query documents from ChromaDB and return a flat list of documents.
         """

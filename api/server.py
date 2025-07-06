@@ -27,12 +27,12 @@ async def startup_event():
         ingestion = DocumentIngestion()
         logger.info("DocumentIngestion initialized successfully")
         
-        stats = ingestion.get_collection_stats()
+        stats = await ingestion.get_collection_stats()
         logger.info(f"Collection stats: {stats}")
         
         if stats == 0:
             logger.info("ChromaDB is empty, starting ingestion...")
-            ingestion.ingest_from_sitemap()
+            await ingestion.ingest_from_sitemap()
             logger.info("ChromaDB updated successfully")
         else:
             logger.info(f"ChromaDB already contains {stats} documents")

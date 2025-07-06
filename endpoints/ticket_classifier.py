@@ -8,7 +8,7 @@ from google import generativeai
 import os
 import re
 import json
-from database.database import insert_into_table, create_table, TABLE_COLUMNS, get_db_connection    
+from database.database import insert_into_table, create_table, TABLE_COLUMNS, get_tickets
 import logging
 from notify.notifier import CONFIG
 from utils.logger import info, error
@@ -76,8 +76,8 @@ async def classify(ticket: Ticket):
         info(f"Parsed classification - Category: {category_value}, Priority: {priority_value}")
         
         metadata = create_metadata(category_value, priority_value, ticket.ticket_id) 
-        create_table("TICKET_METADATA", TABLE_COLUMNS["TICKET_METADATA"])
-        insert_into_table("TICKET_METADATA", list(metadata.keys()), list(metadata.values()))   
+        await create_table("TICKET_METADATA", TABLE_COLUMNS["TICKET_METADATA"])
+        await insert_into_table("TICKET_METADATA", list(metadata.keys()), list(metadata.values()))   
         info(f'Successfully inserted metadata of ticket {ticket.ticket_id} into the database')
 
         processing_time = round(time.time() - start_time, 2)
@@ -109,30 +109,10 @@ def create_metadata(category_value, priority_value, ticket_id):
     return metadata
 
 @router.get("/tickets")
-async def get_tickets():
-    """
-    Get all tickets from the database.
-    """
+async def get_tickets_endpoint():
     try:
-        conn = get_db_connection()
-        cursor = conn.cursor()
-        cursor.execute("SELECT * FROM TICKET_METADATA ORDER BY query_time DESC")
-        tickets = cursor.fetchall()
-        cursor.close()
-        conn.close()
-        
-        # Convert to list of dictionaries
-        ticket_list = []
-        for ticket in tickets:
-            ticket_list.append({
-                "ticket_id": ticket[0],
-                "category": ticket[1], 
-                "priority": ticket[2],
-                "query_time": ticket[3]
-            })
-        
-        return {"tickets": ticket_list, "count": len(ticket_list)}
-        
+        tickets = await get_tickets()
+        return {"tickets": tickets, "count": len(tickets)}
     except Exception as e:
         error(f"Error retrieving tickets: {str(e)}")
         return {"message": f"Error retrieving tickets: {str(e)}"}
