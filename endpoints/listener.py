@@ -34,7 +34,7 @@ async def respond(input: QuestionRequest):
         
         # this is done to flatten the documents list of list in chromadb
         info("Querying documents from ChromaDB")
-        documents = await ingestion.query_documents(question_text, n_results=5)
+        documents = ingestion.query_documents(question_text, n_results=5)
         
         # Prepare context from documents - now documents is already a flat list
         context = "\n".join([str(doc) for doc in documents])

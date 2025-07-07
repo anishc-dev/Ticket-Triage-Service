@@ -27,7 +27,7 @@ async def startup_event():
         ingestion = DocumentIngestion()
         logger.info("DocumentIngestion initialized successfully")
         
-        stats = await ingestion.get_collection_stats()
+        stats = ingestion.get_collection_stats()
         logger.info(f"Collection stats: {stats}")
         
         if stats == 0:

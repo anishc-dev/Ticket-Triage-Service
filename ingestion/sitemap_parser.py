@@ -1,18 +1,22 @@
 import requests
 import xml.etree.ElementTree as ET #used element tree for efficiency, used lxml in different project
 from utils.logger import info, error
+import aiohttp
+import asyncio
 
 class SitemapParser:
     def __init__(self, sitemap_url):
         self.url = sitemap_url
-
-    def get_pages(self):
+    
+    async def get_pages(self):
         """
             parse the sitemap and return the pages
         """
         try:
-            resp = requests.get(self.url)
-            root = ET.fromstring(resp.content)
+            async with aiohttp.ClientSession() as session:
+                async with session.get(self.url) as resp:
+                    content = await resp.text()
+            root = ET.fromstring(content)
             namespace = {'ns': 'http://www.sitemaps.org/schemas/sitemap/0.9'} #defined to get the namespace of the sitemap
             pages = []
             for url_elem in root.findall('.//ns:url', namespace):

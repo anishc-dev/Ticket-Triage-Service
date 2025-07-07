@@ -18,7 +18,7 @@ router = APIRouter()
 templates = Jinja2Templates(directory="templates")
 
 class Ticket(BaseModel):
-    ticket_id: Optional[int] = Field(default=0)
+    ticket_id: Optional[str] = Field(default="0")
     subject: str = Field(default="This is a test subject")
     description: str = Field(default="This is a test description")
     priority: str = Field(default="Low")
